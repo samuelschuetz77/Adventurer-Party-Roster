@@ -1,33 +1,49 @@
-button[aria-pressed] {
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #64748b;
-  border-radius: 0.375rem;
-  background: #fff;
-  color: #1e293b;
-  cursor: pointer;
-}
+:root { font-family: Inter, system-ui, sans-serif; color: #25332f; background: #f3f5f2; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { max-width: 1280px; margin: 0 auto; padding: 40px 24px; line-height: 1.5; }
+h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -.045em; margin: 0 0 24px; font-weight: 750; }
+h2 { font-size: 1.05rem; letter-spacing: -.02em; }
+button, input { font: inherit; }
+button { padding: 10px 16px; border: 1px solid #cdd6cf; border-radius: 8px; background: #fff; color: #35453d; cursor: pointer; font-weight: 600; font-size: .85rem; }
+button:hover { background: #eaf0eb; border-color: #829b8a; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #7baf98; outline-offset: 3px; }
+button[aria-pressed="true"] { background: #285d47; color: #fff; border-color: #285d47; }
+input { min-width: 0; max-width: 100%; padding: 10px 12px; border: 1px solid #cdd6cf; border-radius: 8px; background: white; }
+#find-adventurer-form { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+#find-adventurer-form label { font-size: .85rem; color: #65736a; }
+#find-adventurer-result { max-width: 300px; margin-block: 20px; }
+#find-adventurer-result:empty { margin-block: 16px; }
+#party-statistics { margin: 24px 0 12px; padding: 20px 24px; border: 1px solid #dce3dc; border-radius: 12px; background: #fff; }
+#party-statistics h2 { margin: 0 0 12px; }
+#party-statistics > div { display: flex; flex-wrap: wrap; gap: 12px 40px; }
+#party-statistics p { margin: 0; color: #65736a; font-size: .85rem; }
+#party-statistics span { margin-left: 10px; font-size: 1.3rem; font-weight: 750; color: #25332f; }
+#reset-defaults { background: transparent; }
+#damage-result { min-height: 1.5em; color: #65736a; font-size: .85rem; }
+#party-roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 20px; margin-block: 20px 32px; }
+.adventurer-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid #dce3dc; border-radius: 14px; background: #fff; box-shadow: 0 4px 16px #25332f06; }
+.adventurer-image { width: 100%; height: 220px; display: block; object-fit: contain; padding: 16px; background: #e9eee8; border-bottom: 1px solid #dce3dc; }
+.adventurer-details { display: flex; flex-direction: column; flex: 1; padding: 20px; }
+.adventurer-details p { margin: 0; }
+.adventurer-name { min-height: 3em; font-size: 1.1rem; line-height: 1.5; font-weight: 750; letter-spacing: -.025em; color: #25332f; }
+.adventurer-class { color: #758078; font-size: .85rem; }
+.adventurer-level { margin-top: 14px !important; font-size: .8rem; font-weight: 650; color: #55685b; }
+.adventurer-health { margin-top: 16px !important; color: #55685b; font-size: .8rem; font-variant-numeric: tabular-nums; }
+.health-bar { display: block; appearance: none; border: none; width: 100%; height: 7px; margin: 8px 0 14px; border-radius: 99px; overflow: hidden; background: #e8ede8; accent-color: var(--health-color, #54876a); }
+.health-bar::-webkit-progress-bar { background: #e8ede8; border-radius: 99px; }
+.health-bar::-webkit-progress-value { background: var(--health-color, #54876a); border-radius: 99px; }
+.health-bar::-moz-progress-bar { background: var(--health-color, #54876a); border-radius: 99px; }
+.adventurer-status { align-self: flex-start; padding: 3px 9px; border-radius: 99px; font-size: .72rem; font-weight: 650; background: #edf5ee; color: #3d7151; }
+.adventurer-card[data-active="false"] .adventurer-status { color: #788179; background: #f0f2ef; }
+.adventurer-nickname { margin-top: 12px !important; color: #859086; font-size: .8rem; font-style: italic; }
+.image-source { padding-top: 18px; margin-top: auto; color: #879388; font-size: .68rem; text-decoration: none; }
+.image-source:hover { text-decoration: underline; }
+.take-damage { width: 100%; margin-top: 14px; background: #f8faf7; font-weight: 550; }
+.take-damage:disabled { opacity: .45; cursor: not-allowed; }
+#party-summary { padding: 4px 0 4px 18px; border-left: 2px solid #cfdbd0; }
+.adventurer-summary { margin: 8px 0; font-size: .9rem; color: #65736a; }
+@media (max-width: 600px) { body { padding: 24px 16px; } }
 
-button[aria-pressed="true"] {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  color: #fff;
-}
-
-button[aria-pressed]:focus-visible {
-  outline: 3px solid #f59e0b;
-  outline-offset: 2px;
-}
-
-#party-statistics {
-  margin-block: 1rem;
-  padding: 1rem;
-  max-width: 24rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.5rem;
-  background: #f8fafc;
-  color: #1e293b;
-}
-
-#party-statistics h2 {
-  margin-top: 0;
-}
+.health-bar[data-tone="high"] { --health-color: #54876a; }
+.health-bar[data-tone="medium"] { --health-color: #d97706; }
+.health-bar[data-tone="low"] { --health-color: #dc2626; }

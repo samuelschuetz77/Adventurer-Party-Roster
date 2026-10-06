@@ -35,29 +35,91 @@ const party: Adventurer[] = [
 ];
 
 
+const defaultParty = party.map((adventurer) => ({ ...adventurer }));
+
+const portraits: Record<string, { image: string; source: string }> = {
+  "Bilbo Baggins": { image: "images/bilbo.jpg", source: "https://en.wikipedia.org/wiki/Bilbo_Baggins" },
+  "Trogdor": { image: "images/trogdor.gif", source: "https://www.schuminweb.com/2004/09/24/let-me-show-you-this-is-trogdor/" },
+  "António de Oliveira Salazar": { image: "images/salazar.jpg", source: "https://en.wikipedia.org/wiki/Ant%C3%B3nio_de_Oliveira_Salazar" },
+  "Shrek": { image: "images/shrek.png", source: "https://en.wikipedia.org/wiki/Shrek_(character)" },
+};
+
 const roster = document.querySelector<HTMLDivElement>("#party-roster");
 
-function displayAdventurer(adventurer: Adventurer): void {
+function displayAdventurer(adventurer: Adventurer, target: HTMLElement | null = roster): void {
   const { name, className, level, health, isActive, nickname } = adventurer;
 
+  const card = document.createElement("article");
+  card.className = "adventurer-card";
+  card.setAttribute("aria-label", name);
+  card.dataset.active = String(isActive);
+  const portrait = portraits[name];
+  if (portrait) {
+    const image = document.createElement("img");
+    image.className = "adventurer-image";
+    image.src = portrait.image;
+    image.alt = name;
+    image.width = 320;
+    image.height = 240;
+    image.loading = "lazy";
+    card.appendChild(image);
+  }
+  const content = document.createElement("div");
+  content.className = "adventurer-details";
+  card.appendChild(content);
+
   const details: [string, string][] = [
-    ["name", `Name: ${name}`],
-    ["class", `Class: ${className}`],
-    ["level", `Level: ${level}`],
-    ["health", `Health: ${health}`],
-    ["status", `Status: ${isActive ? "Active" : "Inactive"}`],
+    ["name", name],
+    ["class", className],
+    ["level", `Level ${level}`],
+    ["health", `Health · ${health} / 100`],
+    ["status", isActive ? "Active" : "Inactive"],
   ];
 
   if (nickname !== undefined) {
-    details.push(["nickname", `Nickname: ${nickname}`]);
+    details.push(["nickname", `“${nickname}”`]);
   }
 
   for (const [field, text] of details) {
     const paragraph = document.createElement("p");
     paragraph.className = `adventurer-${field}`;
     paragraph.textContent = text;
-    roster?.appendChild(paragraph);
+    content.appendChild(paragraph);
+    if (field === "health") {
+      const bar = document.createElement("progress");
+      bar.className = "health-bar";
+      bar.dataset.tone = health < 40 ? "low" : health < 60 ? "medium" : "high";
+      bar.max = 100;
+      bar.value = Math.max(0, Math.min(100, health));
+      bar.setAttribute("aria-label", `${name} health`);
+      content.appendChild(bar);
+    }
   }
+  if (portrait) {
+    const source = document.createElement("a");
+    source.className = "image-source";
+    source.href = portrait.source;
+    source.textContent = "Image source ↗";
+    source.target = "_blank";
+    source.rel = "noopener noreferrer";
+    content.appendChild(source);
+  }
+  const damageButton = document.createElement("button");
+  damageButton.type = "button";
+  damageButton.className = "take-damage";
+  damageButton.textContent = "Take Damage";
+  damageButton.setAttribute("aria-label", `Take Damage: ${name}`);
+  damageButton.disabled = health === 0;
+  damageButton.addEventListener("click", () => {
+    takeDamage(adventurer, 20);
+    renderParty();
+    const damageResult = document.querySelector<HTMLParagraphElement>("#damage-result");
+    if (damageResult) {
+      damageResult.textContent = `${name} took 20 damage. Health: ${adventurer.health}.${adventurer.health === 0 ? " Defeated." : ""}`;
+    }
+  });
+  content.appendChild(damageButton);
+  target?.appendChild(card);
 }
 
 
@@ -68,7 +130,7 @@ function findAdventurer(name: string): Adventurer | undefined {
 
 const searchForm = document.querySelector<HTMLFormElement>("#find-adventurer-form");
 const nameInput = document.querySelector<HTMLInputElement>("#adventurer-name-input");
-const searchResult = document.querySelector<HTMLParagraphElement>("#find-adventurer-result");
+const searchResult = document.querySelector<HTMLDivElement>("#find-adventurer-result");
 
 if (searchForm && nameInput && searchResult) {
   searchForm.addEventListener("submit", (event) => {
@@ -85,7 +147,24 @@ if (searchForm && nameInput && searchResult) {
       return;
     }
 
-    searchResult.textContent = `Found: ${adventurer.name} — Level ${adventurer.level} ${adventurer.className}`;
+    searchResult.replaceChildren();
+    const resultCard = document.createElement("article");
+    resultCard.className = "adventurer-card";
+    const portrait = portraits[adventurer.name];
+    if (portrait) {
+      const image = document.createElement("img");
+      image.className = "adventurer-image";
+      image.src = portrait.image;
+      image.alt = adventurer.name;
+      image.width = 320;
+      image.height = 240;
+      resultCard.appendChild(image);
+    }
+    const resultName = document.createElement("p");
+    resultName.className = "adventurer-name adventurer-details";
+    resultName.textContent = adventurer.name;
+    resultCard.appendChild(resultName);
+    searchResult.appendChild(resultCard);
   });
 }
 
@@ -106,7 +185,7 @@ function renderParty(): void {
   showActiveButton?.setAttribute("aria-pressed", String(activeOnly));
   showHighLevelButton?.setAttribute("aria-pressed", String(highLevelOnly));
   roster?.replaceChildren();
-  visibleParty.forEach(displayAdventurer);
+  visibleParty.forEach((adventurer) => displayAdventurer(adventurer));
   displayPartyStatistics();
 }
 
@@ -145,23 +224,6 @@ function takeDamage(adventurer: Adventurer, damage: number): void {
   }
 }
 
-const damageButton = document.querySelector<HTMLButtonElement>("#test-damage");
-const damageResult = document.querySelector<HTMLParagraphElement>("#damage-result");
-
-damageButton?.addEventListener("click", () => {
-  const bilbo = findAdventurer("Bilbo Baggins");
-  const trogdor = findAdventurer("Trogdor");
-  if (!bilbo || !trogdor || !damageResult) {
-    return;
-  }
-
-  takeDamage(bilbo, 20);
-  takeDamage(trogdor, 120);
-  damageResult.textContent = `Bilbo took 20 damage: ${bilbo.health} health remaining. Trogdor took 120 damage: ${trogdor.health} health remaining, inactive.`;
-  renderParty();
-});
-
-
 function getAverageLevel(party: Adventurer[]): number {
   if (party.length === 0) {
     return 0;
@@ -182,3 +244,20 @@ function displayPartyStatistics(): void {
     activeCount.textContent = String(getActiveCount(party));
   }
 }
+
+
+const resetButton = document.querySelector<HTMLButtonElement>("#reset-defaults");
+resetButton?.addEventListener("click", () => {
+  party.splice(0, party.length, ...defaultParty.map((adventurer) => ({ ...adventurer })));
+  activeOnly = false;
+  highLevelOnly = false;
+  searchForm?.reset();
+  searchResult?.replaceChildren();
+  const damageResult = document.querySelector<HTMLParagraphElement>("#damage-result");
+  if (damageResult) damageResult.textContent = "Party restored to defaults.";
+  renderParty();
+});
+
+
+
+

@@ -13,7 +13,7 @@
       <input id="adventurer-name-input" type="text" required />
       <button type="submit">Find</button>
     </form>
-    <p id="find-adventurer-result" role="status"></p>
+    <div id="find-adventurer-result" role="status"></div>
     <button id="show-active" type="button" aria-pressed="false">Show Active</button>
     <button id="show-high-level" type="button" aria-pressed="false">Show Level 5+</button>
     <section id="party-statistics" aria-labelledby="party-statistics-heading">
@@ -23,13 +23,14 @@
         <p>Active adventurers: <span id="active-count"></span></p>
       </div>
     </section>
+    <button id="reset-defaults" type="button">Reset to Defaults</button>
+    <p id="damage-result" role="status"></p>
     <div id="party-roster"></div>
     <section aria-labelledby="party-summary-heading">
       <h2 id="party-summary-heading">Party Summary</h2>
       <div id="party-summary"></div>
     </section>
-    <button id="test-damage" type="button">Test Damage</button>
-    <p id="damage-result" role="status"></p>
+
     <script type="module" src="./dist/src/main.js"></script>
   </body>
 </html>
