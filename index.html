@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>Adventurer Party Roster</title>
+  </head>
+  <body>
+    <h1>Adventurer Party Roster</h1>
+    <form id="find-adventurer-form">
+      <label for="adventurer-name-input">Adventurer name</label>
+      <input id="adventurer-name-input" type="text" required />
+      <button type="submit">Find</button>
+    </form>
+    <p id="find-adventurer-result" role="status"></p>
+    <button id="show-active" type="button" aria-pressed="false">Show Active</button>
+    <button id="show-high-level" type="button" aria-pressed="false">Show Level 5+</button>
+    <section id="party-statistics" aria-labelledby="party-statistics-heading">
+      <h2 id="party-statistics-heading">Party Statistics</h2>
+      <div aria-live="polite">
+        <p>Average level: <span id="average-level"></span></p>
+        <p>Active adventurers: <span id="active-count"></span></p>
+      </div>
+    </section>
+    <div id="party-roster"></div>
+    <section aria-labelledby="party-summary-heading">
+      <h2 id="party-summary-heading">Party Summary</h2>
+      <div id="party-summary"></div>
+    </section>
+    <button id="test-damage" type="button">Test Damage</button>
+    <p id="damage-result" role="status"></p>
+    <script type="module" src="./dist/src/main.js"></script>
+  </body>
+</html>
+
+
+
